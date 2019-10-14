@@ -30,12 +30,11 @@
     correctArticle.classList.add('active');
   };
 
-  /*************************************************************/
+  /******************   Generate Title Links   ****************/
 
   let html = '';
 
   const generateTitleLinks = (function() {
-    //usuń zawartość listy linków w lewej kolumnie,
     /* [DONE}] remove list links content from left column */
     const allLinks = document.querySelector('ul.list.titles');
     allLinks.innerHTML = '';
@@ -58,6 +57,7 @@
         '><span>' +
         articleTitle +
         '</span></a></li>';
+
       /* [DONE] insert link into html variable */
       html += linkHtml;
 
