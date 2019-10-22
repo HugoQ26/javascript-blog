@@ -1,5 +1,8 @@
 'use strict';
 {
+  const optCloudClassCount = 5;
+  const optCloudClassPrefix = 'tag-size-';
+
   const titleClickHandler = function(event) {
     event.preventDefault();
     const clickedElement = this;
@@ -73,11 +76,36 @@
   /* [DONE] execute generateTitleLinks function*/
   generateTitleLinks();
 
+  /******************   Calculate Tags parameters function   ****************/
+
+  const calculateTagsParams = function(tags) {
+    const params = {
+      min: 999999,
+      max: 0
+    };
+    for (const tag in tags) {
+      //console.log(tag + ' is used ' + tags[tag] + ' times');
+      params.max = Math.max(tags[tag], params.max);
+      params.min = Math.min(tags[tag], params.min);
+    }
+    return params;
+  };
+
+  /******************   Calculate Tag Class function   ****************/
+
+  const calculateTagClass = function(count, params) {
+    const normalizedCount = count - params.min;
+    const normalizedMax = params.max - params.min;
+    const percentage = normalizedCount / normalizedMax;
+    return Math.floor(percentage * (optCloudClassCount - 1) + 1);
+  };
+
   /******************   Generate Tags   ****************/
 
   const generateTags = (function() {
     /* [DONE] create a new variable allTags with an empty object */
     let allTags = {};
+
     /* [DONE] create a new variable allTagsHTML for all links HTML code */
     let tagHTML = '';
 
@@ -97,11 +125,6 @@
 
       /* [DONE] START LOOP: for each tag in tagsArray*/
       for (const tag of tagsArray) {
-        /* [DONE] generate HTML of the link */
-        const linkHTML = '<li><a href="#tag-' + tag + '">' + tag + '</a></li>';
-        /* [DONE] insert linkHTML tags wraper  */
-        tagsWraper.insertAdjacentHTML('beforeend', linkHTML);
-
         /* [DONE] check if this link is NOT already in allTags */
         if (!allTags.hasOwnProperty(tag)) {
           /* [DONE] add Tag to allTags object */
@@ -109,10 +132,26 @@
         } else {
           allTags[tag]++;
         }
+        /* [DONE] generate HTML of the link */
+
+        const tagClass = calculateTagClass(
+          allTags[tag],
+          calculateTagsParams(allTags)
+        );
+        const linkHTML = `<li><a href="#tag-${tag}" class="tag-size-${tagClass}">${tag}aaa</a></li>`;
+
+        /* [DONE] insert linkHTML tags wraper  */
+        tagsWraper.insertAdjacentHTML('beforeend', linkHTML);
       }
       /* [DONE] END LOOP: for each tag */
+      console.log(allTags);
     }
     /* [DONE] END LOOP: for every article: */
+
+    /* [DONE] execute calculateTagsParams(allTags) function and save it to constatnt */
+
+    const tagsParams = calculateTagsParams(allTags);
+    console.log('tagsParams', tagsParams);
 
     /* [DONE] find list of tags in right column */
     const tagList = document.querySelector('.tags');

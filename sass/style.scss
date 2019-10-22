@@ -91,6 +91,7 @@ body {
 .list-horizontal {
   li {
     display: inline-block;
+    padding: 0 5px;
   }
 }
 
@@ -119,5 +120,18 @@ body {
   display: flex;
   p {
     margin: 0 10px 0 0;
+  }
+}
+
+/* Header */
+header {
+  background: #000
+    url('https://images.pexels.com/photos/745760/pexels-photo-745760.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260')
+    right 40% / cover no-repeat;
+  margin: 0 10px;
+
+  h1.logo {
+    margin: 0;
+    padding: 70px 0;
   }
 }
