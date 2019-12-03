@@ -1,5 +1,13 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 'use strict';
 {
+  const templates = {
+    articleLink: Handlebars.compile(
+      document.querySelector('#template-article-link').innerHTML
+    )
+  };
   const optCloudClassCount = 5;
   const optCloudClassPrefix = 'tag-size-';
 
@@ -88,6 +96,8 @@
       params.max = Math.max(tags[tag], params.max);
       params.min = Math.min(tags[tag], params.min);
     }
+    console.log('params', params);
+
     return params;
   };
 
@@ -103,75 +113,42 @@
   /******************   Generate Tags   ****************/
 
   const generateTags = (function() {
-    /* [DONE] create a new variable allTags with an empty object */
     let allTags = {};
 
-    /* [DONE] create a new variable allTagsHTML for all links HTML code */
-    let tagHTML = '';
+    let allTagsHTML = '';
 
-    /* [DONE] find all articles */
     const articles = document.querySelectorAll('article');
+    const tagsWraper = document.querySelector('ul.list.tags');
 
-    /* [DONE] START LOOP: for every article: */
     for (const article of articles) {
-      /* find tags wrapper */
-      const tagsWraper = article.querySelector('.post-tags .list');
-
-      /* [DONE] get tags from data-tags attribute */
       const dataTagsAtributes = article.getAttribute('data-tags');
 
-      /* [DONE] split tags into array */
       const tagsArray = dataTagsAtributes.split(' ');
 
-      /* [DONE] START LOOP: for each tag in tagsArray*/
       for (const tag of tagsArray) {
-        /* [DONE] check if this link is NOT already in allTags */
         if (!allTags.hasOwnProperty(tag)) {
-          /* [DONE] add Tag to allTags object */
           allTags[tag] = 1;
         } else {
           allTags[tag]++;
         }
-        /* [DONE] generate HTML of the link */
-
-        const tagClass = calculateTagClass(
-          allTags[tag],
-          calculateTagsParams(allTags)
-        );
-        const linkHTML = `<li><a href="#tag-${tag}" class="tag-size-${tagClass}">${tag}aaa</a></li>`;
-
-        /* [DONE] insert linkHTML tags wraper  */
-        tagsWraper.insertAdjacentHTML('beforeend', linkHTML);
       }
-      /* [DONE] END LOOP: for each tag */
-      console.log(allTags);
     }
-    /* [DONE] END LOOP: for every article: */
-
-    /* [DONE] execute calculateTagsParams(allTags) function and save it to constatnt */
-
     const tagsParams = calculateTagsParams(allTags);
-    console.log('tagsParams', tagsParams);
-
-    /* [DONE] find list of tags in right column */
-    const tagList = document.querySelector('.tags');
-
-    /* [DONE] START LOOP: for each tag in allTags object*/
+    console.log('tagsParams:', tagsParams);
     for (const tag in allTags) {
-      /* [DONE] generate code of a link and add it to allTagsHTML*/
-      tagHTML =
-        "<li><a href='#tag-" +
+      const linkHTML =
+        '<li><a href="#tag-' +
         tag +
-        "'>" +
+        '" class="' +
+        optCloudClassPrefix +
+        calculateTagClass(allTags[tag], tagsParams) +
+        '">' +
         tag +
-        '</a> <span>(' +
-        allTags[tag] +
-        ')</span></li>';
-
-      /* [DONE] insert tagHTML to tags wraper of the right column  */
-      tagList.insertAdjacentHTML('beforeend', tagHTML);
+        '</a></li> ';
+      allTagsHTML += linkHTML;
     }
-    /* [DONE] add html from allTags to tagList */
+
+    tagsWraper.innerHTML = allTagsHTML;
   })();
 
   /******************   Tag Click Handler   ****************/
@@ -231,28 +208,42 @@
   /******************   generateAuthors function   ****************/
 
   const generateAuthors = (function() {
-    /* [DONE] create a new variable authorHTML for author link */
+    const allAuthors = {};
+
     let authorHTML = '';
 
-    /* [DONE] find all articles */
     const articles = document.querySelectorAll('article');
+    const authorsWraper = document.querySelector('ul.list.authors');
 
-    /* [DONE] START LOOP: for every article: */
     for (const article of articles) {
-      /* [DONE] get tags from data-author attribute */
       const dataAuthorAtribute = article.getAttribute('data-author');
-      /* [DONE] convert data-author attribute without "-" */
       const authorProperName = dataAuthorAtribute.split('-').join(' ');
 
-      /* [DONE] find post author wraper */
       const postAuthor = article.querySelector('.post-author');
 
-      /* [DONE] generate code of a link and add it to postAuthor */
+      if (!allAuthors.hasOwnProperty(authorProperName)) {
+        allAuthors[authorProperName] = 1;
+      } else {
+        allAuthors[authorProperName]++;
+      }
+
       authorHTML =
         '<a href=' + dataAuthorAtribute + '>' + authorProperName + '</a>';
 
-      /* [DONE] insert author link to author wraper  */
       postAuthor.insertAdjacentHTML('beforeend', authorHTML);
+    }
+
+    const tagsParams = calculateTagsParams(allAuthors);
+
+    for (const author in allAuthors) {
+      const html =
+        '<li><a href="#" class="' +
+        optCloudClassPrefix +
+        calculateTagClass(allAuthors[author], tagsParams) +
+        '">' +
+        author +
+        '</a></li> ';
+      authorsWraper.insertAdjacentHTML('beforeend', html);
     }
   })();
 

@@ -122,4 +122,30 @@ header h1.logo {
   margin: 0;
   padding: 70px 0;
 }
+
+/* Tags */
+ul.list.tags li,
+ul.list.authors li {
+  display: inline-block;
+}
+
+.tag-size-5 {
+  font-size: 180%;
+}
+
+.tag-size-4 {
+  font-size: 160%;
+}
+
+.tag-size-3 {
+  font-size: 140%;
+}
+
+.tag-size-2 {
+  font-size: 120%;
+}
+
+.tag-size-1 {
+  font-size: 100%;
+}
 /*# sourceMappingURL=style.css.map */
