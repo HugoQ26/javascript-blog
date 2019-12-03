@@ -6,8 +6,21 @@
   const templates = {
     articleLink: Handlebars.compile(
       document.querySelector('#template-article-link').innerHTML
+    ),
+    articleTags: Handlebars.compile(
+      document.querySelector('#template-article-tags').innerHTML
+    ),
+    articleAuthor: Handlebars.compile(
+      document.querySelector('#template-article-author').innerHTML
+    ),
+    cloudAuthor: Handlebars.compile(
+      document.querySelector('#template-author-cloud').innerHTML
+    ),
+    cloudTags: Handlebars.compile(
+      document.querySelector('#template-tag-cloud').innerHTML
     )
   };
+
   const optCloudClassCount = 5;
   const optCloudClassPrefix = 'tag-size-';
 
@@ -45,6 +58,8 @@
   let html = '';
 
   const generateTitleLinks = function(customSelector = '') {
+    const linksArray = [];
+
     /* [DONE}] remove list links content from left column */
     const allLinks = document.querySelector('ul.list.titles');
     allLinks.innerHTML = '';
@@ -59,18 +74,12 @@
       /* [DONE] find element with article title and and save it to constant */
       const articleTitle = article.querySelector('.post-title').innerHTML;
 
-      /* [DONE] create HTML of the link */
-
-      html =
-        '<li><a href=#' +
-        articleId +
-        '><span>' +
-        articleTitle +
-        '</span></a></li>';
-
-      /* [DONE] insert link into links wraper of the left columm */
-      allLinks.insertAdjacentHTML('beforeend', html);
+      const linkHTMLData = { id: articleId, title: articleTitle };
+      linksArray.push(linkHTMLData);
     }
+
+    const linkHTML = templates.articleLink(linksArray);
+    allLinks.innerHTML = linkHTML;
 
     /* [DONE] find all the links and save them to variable: links */
     const links = document.querySelectorAll('.titles a');
@@ -115,14 +124,12 @@
   const generateTags = (function() {
     let allTags = {};
 
-    let allTagsHTML = '';
-
     const articles = document.querySelectorAll('article');
     const tagsWraper = document.querySelector('ul.list.tags');
 
     for (const article of articles) {
       const dataTagsAtributes = article.getAttribute('data-tags');
-
+      const articleTagsWrapper = article.querySelector('.post-tags ul.list');
       const tagsArray = dataTagsAtributes.split(' ');
 
       for (const tag of tagsArray) {
@@ -132,23 +139,28 @@
           allTags[tag]++;
         }
       }
-    }
-    const tagsParams = calculateTagsParams(allTags);
-    console.log('tagsParams:', tagsParams);
-    for (const tag in allTags) {
-      const linkHTML =
-        '<li><a href="#tag-' +
-        tag +
-        '" class="' +
-        optCloudClassPrefix +
-        calculateTagClass(allTags[tag], tagsParams) +
-        '">' +
-        tag +
-        '</a></li> ';
-      allTagsHTML += linkHTML;
+
+      const linkHTML = templates.articleTags(tagsArray);
+      articleTagsWrapper.innerHTML = linkHTML;
     }
 
-    tagsWraper.innerHTML = allTagsHTML;
+    const tagsParams = calculateTagsParams(allTags);
+
+    const handlebarsAllTagsData = [];
+
+    for (const tag in allTags) {
+      const calculate = calculateTagClass(allTags[tag], tagsParams);
+
+      const tagData = {
+        tag,
+        classNo: calculate
+      };
+
+      handlebarsAllTagsData.push(tagData);
+    }
+
+    const cloudHTML = templates.cloudTags(handlebarsAllTagsData);
+    tagsWraper.innerHTML = cloudHTML;
   })();
 
   /******************   Tag Click Handler   ****************/
@@ -210,8 +222,6 @@
   const generateAuthors = (function() {
     const allAuthors = {};
 
-    let authorHTML = '';
-
     const articles = document.querySelectorAll('article');
     const authorsWraper = document.querySelector('ul.list.authors');
 
@@ -221,30 +231,35 @@
 
       const postAuthor = article.querySelector('.post-author');
 
+      const linkHTML = templates.articleAuthor({
+        authorProperName,
+        dataAuthorAtribute
+      });
+      postAuthor.innerHTML = linkHTML;
+
       if (!allAuthors.hasOwnProperty(authorProperName)) {
         allAuthors[authorProperName] = 1;
       } else {
         allAuthors[authorProperName]++;
       }
-
-      authorHTML =
-        '<a href=' + dataAuthorAtribute + '>' + authorProperName + '</a>';
-
-      postAuthor.insertAdjacentHTML('beforeend', authorHTML);
     }
 
     const tagsParams = calculateTagsParams(allAuthors);
-
+    const handlebarsAllAuthorsData = [];
     for (const author in allAuthors) {
-      const html =
-        '<li><a href="#" class="' +
-        optCloudClassPrefix +
-        calculateTagClass(allAuthors[author], tagsParams) +
-        '">' +
-        author +
-        '</a></li> ';
-      authorsWraper.insertAdjacentHTML('beforeend', html);
+      const calculate = calculateTagClass(allAuthors[author], tagsParams);
+
+      const authorData = {
+        name: author,
+        classNo: calculate,
+        dataAuthorAtribute: author.split(' ').join('-')
+      };
+
+      handlebarsAllAuthorsData.push(authorData);
     }
+
+    const cloudHTML = templates.cloudAuthor(handlebarsAllAuthorsData);
+    authorsWraper.innerHTML = cloudHTML;
   })();
 
   /******************   Author Click Handler   ****************/
